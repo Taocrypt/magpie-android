@@ -112,6 +112,27 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;margin-top:24px;colo
 footer .wrap{display:flex;flex-wrap:wrap;gap:10px 20px;justify-content:space-between}
 footer a:hover{color:var(--accent)}
 
+
+.nav{display:flex;gap:4px;margin-right:6px}
+.nav a{color:var(--text2);text-decoration:none;font-size:14px;padding:8px 10px;border-radius:12px}
+.nav a:hover{background:var(--ripple);color:var(--text)}
+.arch{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:28px;overflow-x:auto}
+.arch pre{margin:0;font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.6;color:var(--text2);white-space:pre}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.facts .card h3{font-size:15px;margin:0 0 6px}.facts .card p{margin:0}
+.faq{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.faq details{border-top:1px solid var(--line);padding:16px 20px}.faq details:first-child{border-top:0}
+.faq summary{cursor:pointer;font-weight:500;list-style:none;display:flex;align-items:center;gap:10px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";margin-left:auto;color:var(--muted);font-size:20px;line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq details p{margin:10px 0 0;color:var(--text2);line-height:1.7}
+.rel{margin-top:28px;display:grid;gap:12px}
+.rel .card h3{display:flex;gap:10px;align-items:baseline;margin:0 0 8px;font-size:16px}
+.rel .card h3 span{color:var(--muted);font-size:13px;font-weight:400}
+.rel .card ul{margin:0;padding-left:18px;color:var(--text2);line-height:1.7;font-size:14px}
+.more{display:inline-block;margin-top:14px;color:var(--accent);text-decoration:none;font-size:14px}
+@media (max-width:860px){.facts{grid-template-columns:1fr}.nav{display:none}}
 @media (max-width:860px){
   .hero{grid-template-columns:1fr;padding:44px 0 24px;gap:40px}
   .grid{grid-template-columns:1fr 1fr}
@@ -132,6 +153,7 @@ footer a:hover{color:var(--accent)}
     <span class="brand">magpie</span>
     <span class="chip"><span class="dot"></span>Android</span>
     <span class="sp"></span>
+    <nav class="nav"><a href="#features">功能</a><a href="#how">原理</a><a href="#install">安装</a><a href="#changelog">更新日志</a><a href="#faq">FAQ</a></nav>
     <a class="iconbtn" href="https://github.com/Taocrypt/magpie-android" aria-label="GitHub" title="GitHub">
       <svg class="i" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.2 11.19.6.11.82-.25.82-.57l-.01-2c-3.34.71-4.04-1.58-4.04-1.58-.55-1.36-1.34-1.73-1.34-1.73-1.09-.73.08-.72.08-.72 1.21.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.11-.76.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.83 0-1.29.47-2.34 1.24-3.16-.14-.3-.54-1.5.1-3.12 0 0 1.01-.32 3.3 1.21a11.5 11.5 0 0 1 6 0c2.28-1.53 3.29-1.21 3.29-1.21.64 1.62.24 2.82.12 3.12.77.82 1.23 1.87 1.23 3.16 0 4.53-2.81 5.53-5.48 5.82.42.35.81 1.08.81 2.18l-.01 3.23c0 .31.21.68.82.56C20.56 21.92 24 17.5 24 12.29 24 5.78 18.63.5 12 .5z"/></svg>
     </a>
@@ -192,6 +214,27 @@ footer a:hover{color:var(--accent)}
       <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span><h3>应用内更新</h3><p>内核和外壳分开检查，启动时提示新版本和更新日志。可选镜像，校验签名后再安装，内核支持回滚。</p></div>
       <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><h3>网络兼容</h3><p>本地 DNS 代理固定端口，可再串 http 或 socks5 上游代理，magpie 和外壳的下载都走它。</p></div>
       <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><h3>空间管理</h3><p>按大小列出缓存、日志和组件占用，单独清理或一键清理。内置 Bun，插件开箱即用。</p></div>
+
+      <div class="card"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 14h8"/></svg></span><h3>移动端适配</h3><p>向网页面板注入移动端样式；网页的 alert、confirm、prompt 统一成底部弹窗，支持上传下载文件，渲染崩溃自动恢复。</p></div>
+      <div class="card"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4z"/><path d="M8 10l3 2-3 2M13 15h3"/></svg></span><h3>日志与诊断</h3><p>查看网关日志，导出崩溃日志和诊断信息；更新下载与安装进度显示在通知栏。</p></div>
+    </div>
+  </section>
+
+  <section id="how">
+    <h2>工作原理</h2>
+    <p class="sub">外壳以子进程运行官方 magpie CLI，用 WebView 打开它自带的网页面板。</p>
+    <div class="arch"><pre>┌──────────────────── Android 手机 ────────────────────┐
+│  magpie (com.magpie.android)                          │
+│   ├─ 前台服务 ── 进程守护 / DNS 代理 / 隧道            │
+│   │    └─ magpie 网关   127.0.0.1:3425  ← AI 客户端    │
+│   │       └─ 网页面板   127.0.0.1:3430                 │
+│   └─ 全屏 WebView ──→ 网页面板（注入移动端样式）       │
+└───────────────────────────────────────────────────────┘
+     局域网 0.0.0.0 / Cloudflare Tunnel / Tailscale（可选）</pre></div>
+    <div class="facts">
+      <div class="card"><h3>官方内核</h3><p>首次启动从 usemagpie.ai 下载 <code>magpie-cli-android-arm64</code>，失败改走 GitHub，校验 SHA-256。APK 只内置插件用的 Bun。</p></div>
+      <div class="card"><h3>默认只在本机</h3><p>网关 <code>3425</code>、面板 <code>3430</code>，可改；DNS 代理固定 <code>3435</code>。开启局域网或远程访问后才对外可达。</p></div>
+      <div class="card"><h3>为什么 targetSdk 28</h3><p>Android 只允许 targetSdk ≤ 28 的应用执行自己下载的二进制，这是不打包 CLI 也能运行的前提。</p></div>
     </div>
   </section>
 
@@ -206,6 +249,25 @@ footer a:hover{color:var(--accent)}
       <span class="chip">Android 14+</span><span class="chip">arm64-v8a</span><span class="chip">包名 com.magpie.android</span><span class="chip">签名 CN=Taocrypt</span>
     </div>
     <p class="notice">这是社区做的非官方外壳，与 magpie 作者无隶属关系。magpie 本身的功能和文档请看 <a href="https://github.com/yetone/magpie" style="color:var(--accent)">yetone/magpie</a>。</p>
+  </section>
+
+  <section id="changelog">
+    <h2>更新日志</h2>
+    <p class="sub">最近的版本，完整记录见 GitHub。</p>
+    <div class="rel" id="rel"><div class="card"><p style="margin:0;color:var(--text2)">正在读取 Releases…</p></div></div>
+    <a class="more" href="https://github.com/Taocrypt/magpie-android/blob/main/CHANGELOG.md">查看完整更新日志 →</a>
+  </section>
+
+  <section id="faq">
+    <h2>常见问题</h2>
+    <div class="faq">
+      <details><summary>为什么首次启动要下载东西？</summary><p>magpie CLI 直接来自上游官方渠道并校验 SHA-256，APK 只保留外壳，体积小，上游更新也不必等外壳发版。网络不畅时可在「检查更新 → 下载设置」里配置镜像。</p></details>
+      <details><summary>后台被杀、熄屏后网关不通？</summary><p>在「应用设置」里开启「忽略电池优化」；部分国产系统还需允许「自启动」「后台运行」，并在多任务界面锁定应用。</p></details>
+      <details><summary>怎么让电脑或外网用上手机的网关？</summary><p>同一 Wi-Fi 下打开「允许局域网访问」，用手机 IP 加端口访问；不在同一网络时，在「远程访问」里启用 Cloudflare 临时隧道或 Tailscale。请只在可信网络中使用，并设置好网关密钥。</p></details>
+      <details><summary>内核更新后出了问题？</summary><p>在「检查更新」的内核卡片里可以回滚到上一版本。</p></details>
+      <details><summary>能自己编译吗？</summary><p>可以，项目不依赖 Gradle，<code>build.sh</code> 直接调用 Android SDK 工具链。自己签名的包与官方包签名不同，不能覆盖安装，外壳自更新也会拒绝安装。步骤见 <a href="https://github.com/Taocrypt/magpie-android#从源码构建" style="color:var(--accent)">README</a>。</p></details>
+      <details><summary>这是官方客户端吗？</summary><p>不是。这是社区作品，与 magpie 作者无关。magpie 本身的问题请到 <a href="https://github.com/yetone/magpie" style="color:var(--accent)">yetone/magpie</a> 反馈。</p></details>
+    </div>
   </section>
 </main>
 
@@ -227,6 +289,18 @@ fetch("https://api.github.com/repos/Taocrypt/magpie-android/releases/latest")
       var mb=a?" · "+(a.size/1048576).toFixed(1)+" MB":"";
       document.getElementById("meta").textContent="Android 14 及以上 · arm64"+mb+" · MIT 开源";}
   }).catch(()=>{});
+
+fetch("https://api.github.com/repos/Taocrypt/magpie-android/releases?per_page=3")
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(list=>{
+    var esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+    var md=t=>esc(t).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`([^`]+)`/g,"<code>$1</code>");
+    document.getElementById("rel").innerHTML=list.map(r=>{
+      var lines=(r.body||"").split(/\r?\n/),items=lines.filter(l=>/^\s*[-*] /.test(l)).map(l=>"<li>"+md(l.replace(/^\s*[-*] /,""))+"</li>");
+      var head=lines.find(l=>l.trim()&&!/^\s*[-*] /.test(l))||"";
+      return '<div class="card"><h3>'+esc(r.tag_name)+'<span>'+(r.published_at||"").slice(0,10)+'</span></h3>'+(head?'<p style="margin:0 0 6px">'+md(head)+'</p>':"")+(items.length?"<ul>"+items.join("")+"</ul>":"")+"</div>";
+    }).join("");
+  }).catch(()=>{document.getElementById("rel").innerHTML='<div class="card"><p style="margin:0;color:var(--text2)">暂时读不到 Releases，请到 GitHub 查看。</p></div>';});
 </script>
 </body>
 </html>
