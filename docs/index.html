@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>magpie for Android</title>
+<meta name="description" content="magpie 的非官方安卓外壳：手机上运行 magpie 网关，带悬浮窗、远程访问和应用内更新。">
+<meta name="theme-color" content="#faf7f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b1916" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon.png">
+<meta property="og:title" content="magpie for Android">
+<meta property="og:description" content="把 magpie 网关装进手机。悬浮窗、远程访问、应用内更新。">
+<meta property="og:image" content="https://taocrypt.github.io/magpie-android/icon.png">
+<style>
+:root{
+  --accent:#c4512a;--accent-pressed:#a93f1e;--accent-soft:#f9e6dc;
+  --bar:#fffdf9;--bg:#f3eee7;--bg-top:#faf7f1;--line:#e5dcd1;
+  --surface:#fffdf9;--surface-alt:#f1ebe3;--ok:#267a4e;--off:#a79d92;
+  --muted:#8b8177;--on-accent:#fff9f3;--text:#211d19;--text2:#625a52;
+  --ripple:#1fc4512a;--shadow:0 1px 2px rgba(60,40,20,.05),0 12px 32px -12px rgba(60,40,20,.18);
+}
+@media (prefers-color-scheme:dark){:root{
+  --accent:#f08a5b;--accent-pressed:#ff9d72;--accent-soft:#3b2419;
+  --bar:#211f1c;--bg:#131210;--bg-top:#1b1916;--line:#3a352f;
+  --surface:#211f1c;--surface-alt:#2c2925;--ok:#73cf98;--off:#756d64;
+  --muted:#91877c;--on-accent:#1c120d;--text:#f5efe7;--text2:#c3bab0;
+  --ripple:#33f08a5b;--shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+}}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:Roboto,"Google Sans","PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  color:var(--text);background:linear-gradient(180deg,var(--bg-top),var(--bg) 640px) var(--bg);line-height:1.6;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* app bar */
+.bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bar) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:12px;height:60px}
+.badge{width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;flex:none;overflow:hidden}
+.badge img{width:30px;height:30px;border-radius:8px}
+.brand{font-size:18px;font-weight:500;letter-spacing:.1px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:12px;font-size:12px;color:var(--text2);background:var(--surface-alt)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 20%,transparent)}
+.sp{flex:1}
+.iconbtn{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:var(--text2);transition:background .15s}
+.iconbtn:hover{background:var(--ripple);color:var(--text)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding:72px 0 56px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--accent);background:var(--accent-soft);padding:5px 12px;border-radius:12px;margin-bottom:20px}
+h1{font-size:clamp(34px,5.4vw,54px);line-height:1.12;font-weight:600;letter-spacing:-.5px}
+h1 em{font-style:normal;color:var(--accent)}
+.lead{margin-top:18px;font-size:17px;color:var(--text2);max-width:30em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:10px;height:50px;padding:0 22px;border-radius:16px;font-size:15px;font-weight:500;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:var(--accent-pressed)}
+.btn.secondary{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.btn.secondary:hover{background:var(--surface-alt)}
+.meta{margin-top:16px;font-size:13px;color:var(--muted)}
+
+/* phone mock */
+.phone{justify-self:center;width:300px;border-radius:40px;padding:10px;background:var(--text);box-shadow:var(--shadow)}
+.screen{border-radius:31px;overflow:hidden;background:linear-gradient(180deg,var(--bg-top),var(--bg));height:600px;position:relative;display:flex;flex-direction:column}
+.p-bar{display:flex;align-items:center;gap:10px;padding:34px 14px 12px;background:var(--bar);border-bottom:1px solid var(--line)}
+.p-bar .badge{width:30px;height:30px}.p-bar .badge img{width:25px;height:25px}
+.p-bar b{font-size:15px;font-weight:500}
+.p-addr{margin:12px 14px 0;padding:8px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px}
+.p-addr svg{width:14px;height:14px;color:var(--muted)}
+.p-web{flex:1;margin:12px 14px;border-radius:18px;background:var(--surface);border:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:9px}
+.ln{height:9px;border-radius:5px;background:var(--surface-alt)}
+.ln.a{width:46%;background:var(--accent-soft)}
+.row{display:flex;gap:8px;align-items:center}.row .sq{width:26px;height:26px;border-radius:9px;background:var(--surface-alt)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-top-left-radius:28px;border-top-right-radius:28px;border:1px solid var(--line);border-bottom:0;padding:8px 10px 14px;box-shadow:0 -12px 30px -18px rgba(0,0,0,.35)}
+.handle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 8px}
+.sh-head{display:flex;align-items:center;padding:2px 8px 6px;font-size:13px;font-weight:500}
+.sh-head svg{width:17px;height:17px;color:var(--text2)}
+.item{display:flex;align-items:center;gap:12px;padding:7px 8px;border-radius:18px;font-size:13px}
+.item:first-of-type{background:var(--ripple)}
+.tile{width:34px;height:34px;border-radius:13px;background:var(--surface-alt);display:grid;place-items:center;color:var(--accent)}
+.tile svg{width:18px;height:18px}
+.float{position:absolute;right:-26px;top:120px;width:150px;padding:10px;border-radius:18px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);opacity:.97}
+.float .ln{height:7px;margin-top:6px}
+.ball{position:absolute;left:-22px;top:330px;width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center}
+.ball img{width:28px;height:28px;border-radius:7px}
+.mock{position:relative}
+
+/* sections */
+section{padding:56px 0}
+h2{font-size:clamp(24px,3.4vw,32px);font-weight:600;letter-spacing:-.3px}
+.sub{color:var(--text2);margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card .tile{width:42px;height:42px;margin-bottom:14px}
+.card .tile svg{width:21px;height:21px}
+.card h3{font-size:16px;font-weight:500}
+.card p{font-size:14px;color:var(--text2);margin-top:6px}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:28px}
+.step{display:flex;gap:16px;padding:18px 20px;align-items:flex-start}
+.step+.step{border-top:1px solid var(--line)}
+.num{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:14px;font-weight:600;flex:none}
+.step h3{font-size:15px;font-weight:500}.step p{font-size:14px;color:var(--text2);margin-top:2px}
+code{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:.88em;background:var(--surface-alt);padding:1px 6px;border-radius:6px}
+.req{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.req .chip{font-size:13px;padding:6px 12px}
+.notice{margin-top:22px;padding:16px 18px;border-radius:18px;background:var(--accent-soft);color:var(--text);font-size:14px}
+footer{border-top:1px solid var(--line);padding:28px 0 40px;margin-top:24px;color:var(--muted);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:10px 20px;justify-content:space-between}
+footer a:hover{color:var(--accent)}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;padding:44px 0 24px;gap:40px}
+  .grid{grid-template-columns:1fr 1fr}
+  .float{right:-8px}.ball{left:-8px}
+}
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .bar .chip{display:none}
+  .phone{width:272px}.screen{height:560px}
+  .btn{flex:1;justify-content:center}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <span class="badge"><img src="icon.png" alt=""></span>
+    <span class="brand">magpie</span>
+    <span class="chip"><span class="dot"></span>Android</span>
+    <span class="sp"></span>
+    <a class="iconbtn" href="https://github.com/Taocrypt/magpie-android" aria-label="GitHub" title="GitHub">
+      <svg class="i" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.2 11.19.6.11.82-.25.82-.57l-.01-2c-3.34.71-4.04-1.58-4.04-1.58-.55-1.36-1.34-1.73-1.34-1.73-1.09-.73.08-.72.08-.72 1.21.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.11-.76.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.83 0-1.29.47-2.34 1.24-3.16-.14-.3-.54-1.5.1-3.12 0 0 1.01-.32 3.3 1.21a11.5 11.5 0 0 1 6 0c2.28-1.53 3.29-1.21 3.29-1.21.64 1.62.24 2.82.12 3.12.77.82 1.23 1.87 1.23 3.16 0 4.53-2.81 5.53-5.48 5.82.42.35.81 1.08.81 2.18l-.01 3.23c0 .31.21.68.82.56C20.56 21.92 24 17.5 24 12.29 24 5.78 18.63.5 12 .5z"/></svg>
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <span class="eyebrow"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>非官方安卓外壳</span>
+      <h1>把 <em>magpie</em> 网关<br>装进你的手机</h1>
+      <p class="lead">在 Android 上直接运行 magpie 本地网关，原生界面包好它的管理面板。悬浮窗随时查看，远程访问随处可用，内核和外壳都能在应用里一键更新。</p>
+      <div class="cta">
+        <a class="btn primary" id="dl" href="https://github.com/Taocrypt/magpie-android/releases/latest">
+          <svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span id="dlText">下载 APK</span>
+        </a>
+        <a class="btn secondary" href="https://github.com/Taocrypt/magpie-android">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 9l3 3-3 3M13 15h4"/></svg>查看源码
+        </a>
+      </div>
+      <p class="meta" id="meta">Android 14 及以上 · arm64 · MIT 开源</p>
+    </div>
+
+    <div class="mock" aria-hidden="true">
+      <div class="phone"><div class="screen">
+        <div class="p-bar">
+          <span class="badge"><img src="icon.png" alt=""></span><b>magpie</b><span class="sp"></span>
+          <span class="chip"><span class="dot"></span>运行中</span>
+        </div>
+        <div class="p-addr mono"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 .01 0zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>http://127.0.0.1:3425/v1</div>
+        <div class="p-web">
+          <div class="ln a"></div>
+          <div class="row"><span class="sq"></span><div style="flex:1"><div class="ln" style="width:70%"></div><div class="ln" style="width:45%;margin-top:6px"></div></div></div>
+          <div class="row"><span class="sq"></span><div style="flex:1"><div class="ln" style="width:60%"></div><div class="ln" style="width:35%;margin-top:6px"></div></div></div>
+          <div class="row"><span class="sq"></span><div style="flex:1"><div class="ln" style="width:76%"></div><div class="ln" style="width:40%;margin-top:6px"></div></div></div>
+        </div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div class="sh-head">菜单<span class="sp"></span><svg class="i" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.2 11.19.6.11.82-.25.82-.57l-.01-2c-3.34.71-4.04-1.58-4.04-1.58-.55-1.36-1.34-1.73-1.34-1.73-1.09-.73.08-.72.08-.72 1.21.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.11-.76.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.83 0-1.29.47-2.34 1.24-3.16-.14-.3-.54-1.5.1-3.12 0 0 1.01-.32 3.3 1.21a11.5 11.5 0 0 1 6 0c2.28-1.53 3.29-1.21 3.29-1.21.64 1.62.24 2.82.12 3.12.77.82 1.23 1.87 1.23 3.16 0 4.53-2.81 5.53-5.48 5.82.42.35.81 1.08.81 2.18l-.01 3.23c0 .31.21.68.82.56C20.56 21.92 24 17.5 24 12.29 24 5.78 18.63.5 12 .5z"/></svg></div>
+          <div class="item"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h12v9H4zM9 15v3h11V9h-4"/></svg></span>打开悬浮窗</div>
+          <div class="item"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 .01 0zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span>远程访问</div>
+          <div class="item"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>空间管理</div>
+          <div class="item"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>检查更新</div>
+        </div>
+      </div></div>
+      <div class="float"><div class="row" style="gap:6px"><span class="dot"></span><b style="font-size:11px;font-weight:500">magpie</b></div><div class="ln a" style="width:70%"></div><div class="ln" style="width:90%"></div><div class="ln" style="width:55%"></div></div>
+      <div class="ball"><img src="icon.png" alt=""></div>
+    </div>
+  </div>
+
+  <section id="features">
+    <h2>手机就是你的网关</h2>
+    <p class="sub">magpie 管模型和账号，外壳管它在手机上跑得稳、用得顺手。</p>
+    <div class="grid">
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v9M6.5 6.5a8 8 0 1 0 11 0"/></svg></span><h3>常驻网关</h3><p>前台服务运行官方 magpie CLI，可开机自启。顶栏状态胶囊、通知栏和快捷磁贴都能启停或重启。</p></div>
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h12v9H4zM9 15v3h11V9h-4"/></svg></span><h3>悬浮窗</h3><p>透明度、尺寸、悬浮球都可调，支持贴边、自动隐藏和点击穿透。点图标即以悬浮球打开。</p></div>
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 .01 0zM3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><h3>远程访问</h3><p>Cloudflare 临时隧道、Tailscale、局域网和 mDNS。组件第一次开启时才下载，更新要你确认。</p></div>
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span><h3>应用内更新</h3><p>内核和外壳分开检查，启动时提示新版本和更新日志。可选镜像，校验签名后再安装，内核支持回滚。</p></div>
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></span><h3>网络兼容</h3><p>本地 DNS 代理固定端口，可再串 http 或 socks5 上游代理，magpie 和外壳的下载都走它。</p></div>
+      <div class="card"><span class="tile"><svg class="i" viewBox="0 0 24 24"><path d="M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span><h3>空间管理</h3><p>按大小列出缓存、日志和组件占用，单独清理或一键清理。内置 Bun，插件开箱即用。</p></div>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>三步装好</h2>
+    <div class="group">
+      <div class="step"><span class="num">1</span><div><h3>下载 APK</h3><p>从 <a href="https://github.com/Taocrypt/magpie-android/releases/latest" style="color:var(--accent)">Releases</a> 下载 <code>magpie-&lt;版本&gt;.apk</code>，允许浏览器安装未知应用。</p></div></div>
+      <div class="step"><span class="num">2</span><div><h3>首次启动</h3><p>外壳会从官方渠道下载 magpie CLI 并校验 SHA-256，完成后网关自动启动。</p></div></div>
+      <div class="step"><span class="num">3</span><div><h3>把 Agent 指向它</h3><p>复制顶栏地址，例如 <code>http://127.0.0.1:3425/v1</code>，在网页面板里配好模型和账号。</p></div></div>
+    </div>
+    <div class="req">
+      <span class="chip">Android 14+</span><span class="chip">arm64-v8a</span><span class="chip">包名 com.magpie.android</span><span class="chip">签名 CN=Taocrypt</span>
+    </div>
+    <p class="notice">这是社区做的非官方外壳，与 magpie 作者无隶属关系。magpie 本身的功能和文档请看 <a href="https://github.com/yetone/magpie" style="color:var(--accent)">yetone/magpie</a>。</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>magpie for Android · MIT · 由 <a href="https://github.com/Taocrypt">Taocrypt</a> 维护</span>
+    <span><a href="https://github.com/Taocrypt/magpie-android">GitHub</a> · <a href="https://github.com/Taocrypt/magpie-android/blob/main/NOTICE.md">第三方说明</a> · <a href="https://usemagpie.ai">magpie 官网</a></span>
+  </div>
+</footer>
+
+<script>
+fetch("https://api.github.com/repos/Taocrypt/magpie-android/releases/latest")
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(j=>{
+    var a=(j.assets||[]).find(x=>/\.apk$/.test(x.name));
+    var v=(j.tag_name||"").replace(/^v/,"");
+    if(a){document.getElementById("dl").href=a.browser_download_url;}
+    if(v){document.getElementById("dlText").textContent="下载 "+v;
+      var mb=a?" · "+(a.size/1048576).toFixed(1)+" MB":"";
+      document.getElementById("meta").textContent="Android 14 及以上 · arm64"+mb+" · MIT 开源";}
+  }).catch(()=>{});
+</script>
+</body>
+</html>

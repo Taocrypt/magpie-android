@@ -8,6 +8,8 @@ An unofficial Android shell for [magpie](https://github.com/yetone/magpie). It r
 
 ## 下载
 
+官网：<https://taocrypt.github.io/magpie-android/>
+
 到 [Releases](https://github.com/Taocrypt/magpie-android/releases/latest) 下载 `magpie-<版本>.apk`，可以直接覆盖安装。
 
 - 系统要求：Android 14 及以上（minSdk 34），arm64 设备
