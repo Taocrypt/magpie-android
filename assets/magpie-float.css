@@ -1,0 +1,3 @@
+/* magpie in the floating window: a narrow, short viewport. Keep it quiet. */
+html.magpie-floating, html.magpie-floating body { overscroll-behavior: contain; }
+html.magpie-floating ::-webkit-scrollbar { width: 0; height: 0; }
