@@ -132,6 +132,25 @@ footer a:hover{color:var(--accent)}
 .rel .card h3 span{color:var(--muted);font-size:13px;font-weight:400}
 .rel .card ul{margin:0;padding-left:18px;color:var(--text2);line-height:1.7;font-size:14px}
 .more{display:inline-block;margin-top:14px;color:var(--accent);text-decoration:none;font-size:14px}
+
+.dg{display:grid;gap:14px}
+.dg-dev{border:1.5px dashed var(--line);border-radius:22px;padding:16px;position:relative}
+.dg-lbl{font-size:12px;color:var(--muted);letter-spacing:.04em;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.dg-app{background:var(--bg-top);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.dg-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.dg-box h4{margin:0 0 4px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:8px}
+.dg-box p{margin:0;font-size:12.5px;color:var(--text2);line-height:1.5}
+.dg-box .port{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:8px;margin-left:auto}
+.dg-col{display:grid;gap:10px}
+.dg-svc{border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px;background:var(--surface-alt)}
+.dg-arrow{color:var(--accent);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--muted)}
+.dg-arrow svg{width:56px;height:16px;color:var(--accent)}
+.dg-ext{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.dg-ext .chip{font-size:12.5px}
+.dg-up{display:flex;justify-content:center;color:var(--accent)}
+.dg-up svg{width:16px;height:22px}
+.dg-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+@media (max-width:760px){.dg-app{grid-template-columns:1fr}.dg-arrow svg{transform:rotate(90deg);height:40px;width:16px}}
 @media (max-width:860px){.facts{grid-template-columns:1fr}.nav{display:none}}
 @media (max-width:860px){
   .hero{grid-template-columns:1fr;padding:44px 0 24px;gap:40px}
@@ -223,14 +242,26 @@ footer a:hover{color:var(--accent)}
   <section id="how">
     <h2>工作原理</h2>
     <p class="sub">外壳以子进程运行官方 magpie CLI，用 WebView 打开它自带的网页面板。</p>
-    <div class="arch"><pre>┌──────────────────── Android 手机 ────────────────────┐
-│  magpie (com.magpie.android)                          │
-│   ├─ 前台服务 ── 进程守护 / DNS 代理 / 隧道            │
-│   │    └─ magpie 网关   127.0.0.1:3425  ← AI 客户端    │
-│   │       └─ 网页面板   127.0.0.1:3430                 │
-│   └─ 全屏 WebView ──→ 网页面板（注入移动端样式）       │
-└───────────────────────────────────────────────────────┘
-     局域网 0.0.0.0 / Cloudflare Tunnel / Tailscale（可选）</pre></div>
+    <div class="arch dg">
+      <div class="dg-dev">
+        <p class="dg-lbl">ANDROID 手机 · com.magpie.android</p>
+        <div class="dg-app">
+          <div class="dg-col">
+            <div class="dg-box"><h4>全屏 WebView</h4><p>打开网页面板，注入移动端样式与脚本</p></div>
+            <div class="dg-box"><h4>AI 客户端</h4><p>Codex、Claude Code 等指向本机网关</p></div>
+          </div>
+          <div class="dg-arrow"><svg viewBox="0 0 56 16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h46M44 3l6 5-6 5"/></svg><span>本机 HTTP</span></div>
+          <div class="dg-svc">
+            <p class="dg-lbl" style="margin:0"><span class="dg-dot"></span>前台服务 · 进程守护 / DNS 代理 / 隧道</p>
+            <div class="dg-box"><h4>magpie 网关<span class="port">:3425</span></h4><p>官方 magpie CLI，以子进程运行</p></div>
+            <div class="dg-box"><h4>网页面板<span class="port">:3430</span></h4><p>管理模型、账号与密钥</p></div>
+            <div class="dg-box"><h4>DNS 代理<span class="port">:3435</span></h4><p>可串联 HTTP / SOCKS5 上游代理</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="dg-up"><svg viewBox="0 0 16 22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20V3M3 8l5-5 5 5"/></svg></div>
+      <div class="dg-ext"><span class="dg-lbl" style="margin:0">可选对外访问</span><span class="chip">局域网 0.0.0.0 · mDNS</span><span class="chip">Cloudflare Tunnel</span><span class="chip">Tailscale</span></div>
+    </div>
     <div class="facts">
       <div class="card"><h3>官方内核</h3><p>首次启动从 usemagpie.ai 下载 <code>magpie-cli-android-arm64</code>，失败改走 GitHub，校验 SHA-256。APK 只内置插件用的 Bun。</p></div>
       <div class="card"><h3>默认只在本机</h3><p>网关 <code>3425</code>、面板 <code>3430</code>，可改；DNS 代理固定 <code>3435</code>。开启局域网或远程访问后才对外可达。</p></div>
