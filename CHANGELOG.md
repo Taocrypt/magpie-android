@@ -2,6 +2,12 @@
 
 每个版本的 APK 在 [Releases](https://github.com/Taocrypt/magpie-android/releases)。
 
+## 1.4.11 — 2026-11-05
+
+**官网图标尺寸与 GitHub 图标对齐。**
+
+- 地球图标原本是满圆，看起来比 GitHub 图标大一圈。现已按视觉面积缩小，两个图标看起来一样大
+
 ## 1.4.10 — 2026-11-05
 
 **官网按钮换成与 GitHub 图标风格一致的地球图标。**
