@@ -170,6 +170,13 @@ final class ShellUpdater {
         //noinspection ResultOfMethodCallIgnored
         dir.mkdirs();
         File out = new File(dir, "magpie-" + r.version + ".apk");
+        final Updater.Progress ui = p;
+        final String title = "正在下载外壳 " + r.version;
+        p = (st, pc) -> {
+            ui.onProgress(st, pc);
+            UpdateNotifier.progress(c, UpdateNotifier.ID_SHELL, pc >= 0 ? title : st, pc >= 0 ? "可以离开这个页面，下载会继续" : "马上就好", pc);
+        };
+        p.onProgress(title, 0);
         HttpURLConnection conn = open(Updater.mirrored(c, r.apkUrl), true);
         int code = conn.getResponseCode();
         if (code != 200) throw new IOException("下载失败 HTTP " + code);
@@ -241,13 +248,24 @@ final class ShellUpdater {
         return false;
     }
 
+    static String versionOf(Context c, File apk) {
+        try {
+            PackageInfo pi = c.getPackageManager().getPackageArchiveInfo(apk.getAbsolutePath(), 0);
+            if (pi != null && pi.versionName != null) return pi.versionName;
+        } catch (RuntimeException ignored) {
+        }
+        return "";
+    }
+
     static boolean canInstall(Context c) {
         return c.getPackageManager().canRequestPackageInstalls();
     }
 
     /** Hands the APK to the system installer; the user confirms on the system screen. */
-    static void install(Activity a, File apk, Result result) throws IOException {
+    static void install(Context a, File apk, Result result) throws IOException {
         final Context app = a.getApplicationContext();
+        final String ver = versionOf(app, apk);
+        UpdateNotifier.progress(app, UpdateNotifier.ID_SHELL, "正在安装外壳 " + ver, "正在交给系统安装器", -1);
         PackageInstaller pi = app.getPackageManager().getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
         params.setAppPackageName(app.getPackageName());
@@ -268,10 +286,12 @@ final class ShellUpdater {
                         Intent confirm = i.getParcelableExtra(Intent.EXTRA_INTENT, Intent.class);
                         if (confirm != null) {
                             confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            // The notification stays even if the screen below never shows (app in background) or gets dismissed.
+                            UpdateNotifier.shellConfirm(ctx, ver, confirm);
                             try {
                                 ctx.startActivity(confirm);
                             } catch (RuntimeException e) {
-                                result.done("打不开系统安装界面：" + e.getMessage());
+                                result.done("请在通知栏点「安装」继续");
                             }
                         }
                         return;
@@ -282,18 +302,26 @@ final class ShellUpdater {
                     }
                     busy = false;
                     if (st == PackageInstaller.STATUS_SUCCESS) {
+                        UpdateNotifier.markShellPending(ctx, false);
+                        UpdateNotifier.finish(ctx, UpdateNotifier.ID_SHELL, "外壳已更新到 " + ver, "点按打开 magpie", null);
                         result.done("外壳已更新");
                     } else if (st == PackageInstaller.STATUS_FAILURE_ABORTED) {
-                        result.done("已取消安装");
+                        UpdateNotifier.markShellPending(ctx, false);
+                        UpdateNotifier.shellRetry(ctx, "外壳 " + ver + " 安装已取消", "下载好的安装包还在", apk);
+                        result.done("已取消安装，可以在通知栏点按重新安装");
                     } else {
+                        UpdateNotifier.markShellPending(ctx, false);
                         String msg = i.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE);
-                        result.done("安装失败：" + (msg == null ? "代码 " + st : msg));
+                        String why = msg == null ? "代码 " + st : msg;
+                        UpdateNotifier.shellRetry(ctx, "外壳 " + ver + " 安装失败", why, apk);
+                        result.done("安装失败：" + why);
                     }
                 }
             };
             app.registerReceiver(rx, new IntentFilter(ACTION_STATUS), Context.RECEIVER_NOT_EXPORTED);
             Intent cb = new Intent(ACTION_STATUS).setPackage(app.getPackageName());
             PendingIntent pend = PendingIntent.getBroadcast(app, id, cb, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+            UpdateNotifier.markShellPending(app, true);
             s.commit(pend.getIntentSender());
         }
     }

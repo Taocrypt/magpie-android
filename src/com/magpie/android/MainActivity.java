@@ -68,6 +68,9 @@ import java.util.concurrent.Executors;
 
 public final class MainActivity extends Activity {
     public static final String ACTION_SHOW_LOG = "com.magpie.android.SHOW_LOG";
+    public static final String ACTION_UPDATES = "com.magpie.android.SHOW_UPDATES";
+    public static final String ACTION_SHELL_INSTALL = "com.magpie.android.SHELL_INSTALL";
+    public static final String EXTRA_APK = "apk";
     public static final String ACTION_FLOAT = "com.magpie.android.FLOAT";
     public static final String ACTION_RESTART = "com.magpie.android.RESTART";
     private static final String PERMISSION_LOCAL_NETWORK = "android.permission.ACCESS_LOCAL_NETWORK";
@@ -361,6 +364,11 @@ public final class MainActivity extends Activity {
             toast("正在重启网关…");
         } else if (ACTION_SHOW_LOG.equals(a)) {
             handler.postDelayed(this::showLog, 300L);
+        } else if (ACTION_UPDATES.equals(a)) {
+            handler.postDelayed(this::showUpdates, 300L);
+        } else if (ACTION_SHELL_INSTALL.equals(a)) {
+            final String path = i.getStringExtra(EXTRA_APK);
+            handler.postDelayed(() -> reinstallShell(path), 300L);
         }
     }
 
@@ -1061,7 +1069,12 @@ public final class MainActivity extends Activity {
             k.actions.setAlpha(0.5f);
             cli.execute(() -> {
                 try {
-                    Updater.install(this, r, (stage, pc) -> handler.post(() -> k.say(pc >= 0 ? stage + "  " + pc + "%" : stage)));
+                    UpdateNotifier.progress(this, UpdateNotifier.ID_KERNEL, "正在更新内核 " + r.version, "准备下载", 0);
+                    Updater.install(this, r, (stage, pc) -> {
+                        UpdateNotifier.progress(this, UpdateNotifier.ID_KERNEL, "正在更新内核 " + r.version, stage, pc);
+                        handler.post(() -> k.say(pc >= 0 ? stage + "  " + pc + "%" : stage));
+                    });
+                    UpdateNotifier.finish(this, UpdateNotifier.ID_KERNEL, "内核已更新到 " + r.version, "网关正在重启", null);
                     MagpieGateway.stop();
                     handler.post(() -> {
                         k.say(getString(R.string.upd_done, r.version));
@@ -1071,6 +1084,8 @@ public final class MainActivity extends Activity {
                         restart();
                     });
                 } catch (IOException e) {
+                    UpdateNotifier.finish(this, UpdateNotifier.ID_KERNEL, "内核 " + r.version + " 更新失败",
+                            e.getMessage() + "\n点按打开更新页重试", null);
                     handler.post(() -> {
                         k.say(getString(R.string.dl_failed, String.valueOf(e.getMessage())) + "\n" + getString(R.string.dl_failed_hint));
                         k.actions.setAlpha(1f);
@@ -1162,6 +1177,22 @@ public final class MainActivity extends Activity {
         }
     }
 
+    /** Tapped "重新安装" on the notification: hand the already verified file to the installer again. */
+    private void reinstallShell(String path) {
+        File apk = path == null ? null : new File(path);
+        if (apk == null || !apk.isFile()) { toast("安装包已被清理，请重新下载"); showUpdates(); return; }
+        if (ShellUpdater.busy) { toast("外壳更新已经在进行"); return; }
+        if (!ShellUpdater.canInstall(this)) { toast("请先允许 magpie 安装未知应用"); showUpdates(); return; }
+        ShellUpdater.busy = true;
+        try {
+            ShellUpdater.install(this, apk, msg -> handler.post(() -> toast(msg)));
+        } catch (IOException e) {
+            ShellUpdater.busy = false;
+            UpdateNotifier.shellRetry(this, "外壳安装失败", String.valueOf(e.getMessage()), apk);
+            toast("安装失败：" + e.getMessage());
+        }
+    }
+
     /** Direct download: fetch, verify, hand to the system installer. info shows progress; row (may be null) is disabled meanwhile. */
     private void runShellInstall(final ShellUpdater.Info r, final TextView info, final View row) {
         if (ShellUpdater.busy) { toast("外壳更新已经在进行"); return; }
@@ -1194,12 +1225,15 @@ public final class MainActivity extends Activity {
                         }));
                     } catch (IOException e) {
                         ShellUpdater.busy = false;
+                        UpdateNotifier.shellRetry(this, "外壳安装失败", String.valueOf(e.getMessage()), apk);
                         info.setText("安装失败：" + e.getMessage());
                         if (row != null) row.setEnabled(true);
                     }
                 });
             } catch (IOException e) {
                 ShellUpdater.busy = false;
+                UpdateNotifier.finish(this, UpdateNotifier.ID_SHELL, "外壳 " + r.version + " 下载失败",
+                        e.getMessage() + "\n点按打开更新页，可以换镜像重试或用浏览器下载", null);
                 handler.post(() -> {
                     info.setText("下载失败：" + e.getMessage() + "\n可以设置下载镜像后重试，或改用浏览器下载。");
                     if (row != null) row.setEnabled(true);
