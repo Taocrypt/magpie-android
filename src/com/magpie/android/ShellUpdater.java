@@ -32,6 +32,7 @@ final class ShellUpdater {
     static final String REPO = "Taocrypt/magpie-android";
     static final String HOME = "https://github.com/" + REPO;
     static final String RELEASES = HOME + "/releases";
+    static final String SITE = "https://taocrypt.github.io/magpie-android/";
     private static final String API = "https://api.github.com/repos/" + REPO + "/releases/latest";
     private static final String ACTION_STATUS = "com.magpie.android.SHELL_INSTALL_STATUS";
 

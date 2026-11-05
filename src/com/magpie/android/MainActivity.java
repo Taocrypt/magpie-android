@@ -724,6 +724,11 @@ public final class MainActivity extends Activity {
         gh.setContentDescription("GitHub 项目主页");
         gh.setVisibility(View.VISIBLE);
         gh.setOnClickListener(v -> { d.dismiss(); openExternal(ShellUpdater.HOME); });
+        ImageView site = d.findViewById(R.id.sheetAction2);
+        site.setImageResource(R.drawable.ic_website);
+        site.setContentDescription("官网");
+        site.setVisibility(View.VISIBLE);
+        site.setOnClickListener(v -> { d.dismiss(); openExternal(ShellUpdater.SITE); });
         addSheetItem(items, R.drawable.ic_refresh, R.string.menu_reload, getString(R.string.menu_reload_hint), () -> { d.dismiss(); reload(); });
         addSheetItem(items, R.drawable.ic_open_external, R.string.menu_open_browser, getString(R.string.menu_open_browser_hint), () -> { d.dismiss(); openExternal(MagpieGateway.pageUrl(this)); });
         addSheetItem(items, R.drawable.ic_float, FloatService.isShowing() ? R.string.menu_float_hide : R.string.menu_float_show,

@@ -2,6 +2,12 @@
 
 每个版本的 APK 在 [Releases](https://github.com/Taocrypt/magpie-android/releases)。
 
+## 1.4.9 — 2026-11-05
+
+**菜单新增官网入口。**
+
+- 菜单右上角 GitHub 图标左边加了一个主页图标，点按会用浏览器打开官网 https://taocrypt.github.io/magpie-android/
+
 ## 1.4.8 — 2026-11-05
 
 **更新进度显示在通知栏**，中途切走或弹窗被打断也不会丢。

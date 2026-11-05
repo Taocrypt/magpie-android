@@ -13,7 +13,7 @@ BUN_SO=${BUN_SO:-/workspace/work/magpie/apk/lib/arm64-v8a/libmagpiebun.so}
 [ -f "$BUN_SO" ] || BUN_SO=lib/arm64-v8a/libmagpiebun.so
 rm -rf build && mkdir -p build/gen build/classes build/dex build/stage/lib/arm64-v8a
 $AAPT2 compile --dir res -o build/res.zip
-$AAPT2 link -I $AJ --manifest AndroidManifest.xml -A assets --java build/gen -o build/base.apk build/res.zip --min-sdk-version 34 --target-sdk-version 28 --version-code 28 --version-name 1.4.8 --auto-add-overlay
+$AAPT2 link -I $AJ --manifest AndroidManifest.xml -A assets --java build/gen -o build/base.apk build/res.zip --min-sdk-version 34 --target-sdk-version 28 --version-code 29 --version-name 1.4.9 --auto-add-overlay
 $JDK/javac -nowarn -source 11 -target 11 -encoding UTF-8 -classpath $AJ -d build/classes $(find src build/gen -name "*.java") 2>&1 | grep -v "bootstrap\|^warning\|^1 warning" || true
 ls build/classes/com/magpie/android/MainActivity.class >/dev/null
 $JDK/java -cp $BT/lib/d8.jar com.android.tools.r8.D8 --release --min-api 34 --lib $AJ --output build/dex $(find build/classes -name "*.class")
